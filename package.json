@@ -2,7 +2,7 @@
   "name": "vue-nodes",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "serve": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"
   },
@@ -11,6 +11,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.0.0",
+    "sass": "^1.48.0",
+    "sass-loader": "^12.4.0",
     "typescript": "^4.4.4",
     "vite": "^2.7.2",
     "vue-tsc": "^0.29.8"
