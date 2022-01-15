@@ -11,16 +11,18 @@ const emit = defineEmits(['update:nodes', 'update:hovered', 'update:selected', '
 
 const props = defineProps({
   nodes: { type: Array as PropType<Node[]>, required: true },
+  connections: { type: Array as PropType<Connection[]>, required: true },
+  // Preferences
   moveButton: { type: String as PropType<'right' | 'left' | 'middle'>, default: 'right' },
-  connections: { type: Array as PropType<Connection[]>, default: () => [] }
 })
 
 const connectionsProp = toRef(props, 'connections')
 
 const [syncNodes] = useSyncProp(props, 'nodes', emit)
+const [syncConnections] = useSyncProp(props, 'connections', emit)
 
 const connectionsRef = ref<HTMLElement>()
-const { connectFrom, connectTo, disconnect, connections, setConnectFromRef, setConnectToRef } = useConnections(connectionsRef.value!, connectionsProp)
+const { connectFrom, connectTo, disconnect, connections, setConnectFromRef, setConnectToRef } = useConnections(connectionsRef.value!, syncConnections)
 </script>
 
 <template>

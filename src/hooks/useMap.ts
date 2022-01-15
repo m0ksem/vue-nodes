@@ -1,26 +1,21 @@
-type A = Number
-type test = undefined extends A ? Number | undefined : Number
+import { ref, UnwrapRef } from 'vue'
 
-const isUndef = (o: any): o is undefined => o === undefined
+type Cache<Key, Data> = { key: Key, value: Data }
 
 export const useMap = <Key = string, Data extends any = any>() => {
   const createMap = () => {
-    const cache: {
-      key: Key,
-      value: Data
-    }[] = []
+    const cache = ref([] as Cache<Key, Data>[])
 
     return {
-      cache,
       get<Fallback extends Data | undefined = undefined>(key: Key, fallback?: Fallback): undefined extends Fallback ? Data | undefined : Data {
-        const result = cache.find((c) => c.key === key)
+        const result = cache.value.find((c) => c.key === key)
 
-        if (isUndef(fallback)) {
+        if (fallback === undefined) {
           return result?.value as Data
         }
 
         if (result) {
-          return result.value
+          return result.value as Data
         } else {
           this.set(key, fallback as Data)
           return fallback as Data
@@ -28,12 +23,12 @@ export const useMap = <Key = string, Data extends any = any>() => {
       },
       
       set(key: Key, value: Data) {
-        const cached = cache.find((c) => c.key === key)
+        const cached = cache.value.find((c) => c.key === key)
 
         if (cached) { 
-          cached.value = value
+          cached.value = value as UnwrapRef<Data>
         } else {
-          cache.push({ key, value })
+          cache.value.push({ key, value } as Cache<UnwrapRef<Key>, UnwrapRef<Data>>)
         }
 
         return value

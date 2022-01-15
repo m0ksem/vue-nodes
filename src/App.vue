@@ -12,12 +12,23 @@ const items = ref([
     name: 'Item 2',
     position: { x: -105, y: 100 }
   },
+  {
+    name: 'Item 3',
+    position: { x: 105, y: 200 }
+  },
+])
+
+const connections = ref([
+  {
+    start: items.value[0],
+    end: items.value[1]
+  }
 ])
 </script>
 
 <template>
   <DemoHeader />
-  <NodesCanvas v-model:nodes="items">
+  <NodesCanvas v-model:nodes="items" v-model:connections="connections">
     <template #node-content="{ 
         node, disconnectListener, connectFromListeners, 
         connectTargetListeners, setConnectFromRef, setConnectToRef, 

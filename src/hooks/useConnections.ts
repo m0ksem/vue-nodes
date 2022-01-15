@@ -27,12 +27,14 @@ export const useConnections = (
     const activeConnections = connections.value.map((con) => {
       const startNodes = nodesMap.get(con.start)
       const endNodes = nodesMap.get(con.end)
+
+      if (!startNodes || !endNodes) { return null }
   
       return {
-        start: startNodes!.connectFrom!,
-        end: endNodes!.connectTo!
+        start: startNodes.connectFrom!,
+        end: endNodes.connectTo!
       }
-    })
+    }).filter((c) => c !== null) as RawConnection[]
 
     if (newConnection.value) {
       const newConnectionEl = nodesMap.get(newConnection.value)
