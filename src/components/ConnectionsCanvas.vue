@@ -21,7 +21,7 @@ const getVueElement = (comp: any): HTMLElement => {
 }
 
 const safePoint = (point: Point | HTMLElement) => {
-    if (!point) return { x: 0, y: 0 }
+  if (!point) return { x: 0, y: 0 }
 
   if ('x' in point && 'y' in point) {
     return point
@@ -50,6 +50,8 @@ const draw = () => {
   const ctx = context.value as CanvasRenderingContext2D
   const w = canvas.value?.width || 0
   const h = canvas.value?.height || 0
+  ctx.lineWidth = 12;
+  ctx.strokeStyle = 'gray'
   ctx.clearRect(0, 0, w, h)
 
   const { x: canvasX, y: canvasY, width: canvasWidth, height: canvasHeight } = canvas.value.getBoundingClientRect()
@@ -80,26 +82,30 @@ const render = () => {
 
 const updateCanvasHeight = () => {
   if (!canvas.value) { return }
-  canvas.value.height = canvas.value.offsetHeight
-  canvas.value.width = canvas.value.offsetWidth
 
-  context.value = canvas.value?.getContext('2d') as CanvasRenderingContext2D
-  context.value.lineWidth = 12;
-  context.value.strokeStyle = 'gray'
+  const { width, height } = canvas.value.getBoundingClientRect()
+
+  canvas.value.height = height
+  canvas.value.width = width
 }
+
+let observer: ResizeObserver 
 
 onMounted(() => {
   if (!canvas.value) { return }
 
   updateCanvasHeight()
 
+  context.value = canvas.value.getContext('2d') as CanvasRenderingContext2D
+
   render()
 
-  window.addEventListener('resize', updateCanvasHeight)
+  observer = new ResizeObserver(updateCanvasHeight)
+  observer.observe(canvas.value)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateCanvasHeight)
+  observer.disconnect()
 })
 </script>
 

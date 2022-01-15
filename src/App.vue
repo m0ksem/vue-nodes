@@ -1,21 +1,15 @@
 <script setup lang="ts">
 import NodesCanvas from './components/Nodes.vue'
 import DemoHeader from './components/demo/DemoHeader.vue';
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useConnectionsPath } from './hooks/useConnectionsPath'
 
 const items = ref([
-  {
-    name: 'Item 1',
-    position: { x: 0, y: 0 }
-  },
-  {
-    name: 'Item 2',
-    position: { x: -105, y: 100 }
-  },
-  {
-    name: 'Item 3',
-    position: { x: 105, y: 200 }
-  },
+  { position: { x: 0, y: 0 }, color: '#00fffc' },
+  { position: { x: -200, y: 100 }, color: '#fc00ff', },
+  { position: { x: 105, y: 200 }, color: '#fffc00' },
+  { position: { x: 205, y: -200 }, color: '#6AB547' },
+  { position: { x: 305, y: 0 }, color: '#63326E' },
 ])
 
 const connections = ref([
@@ -24,18 +18,33 @@ const connections = ref([
     end: items.value[1]
   }
 ])
+
+const { generateCircularPath } = useConnectionsPath(connections)
+
+const path = computed(() => generateCircularPath())
+
+const gradientStyle = computed(() => {
+  if (path.value.length === 1) { return `linear-gradient(40deg, #fff 0%, #fff 100%)`}
+
+  const colors = path.value
+    .map((cur, index) => `${cur.color} ${index * (100 / (path.value.length - 1))}%`).join(', ')
+
+  return `linear-gradient(40deg, ${colors})`
+}
+
+)
 </script>
 
 <template>
-  <DemoHeader />
+  <DemoHeader>
+    <h1 :style="{ backgroundImage: gradientStyle }">Vue nodes demo</h1>
+  </DemoHeader>
   <NodesCanvas v-model:nodes="items" v-model:connections="connections">
     <template #node-content="{ 
         node, disconnectListener, connectFromListeners, 
         connectTargetListeners, setConnectFromRef, setConnectToRef, 
       }">
-      <div class="nodes-demo-item">
-        {{ node.name }}
-
+      <div class="nodes-demo-item" :style="{ background: node.color }">
         <button v-bind="connectFromListeners" :ref="setConnectFromRef(node)">connect from</button>
         <button v-bind="connectTargetListeners" :ref="setConnectToRef(node)">connect to</button>
         <button v-bind="disconnectListener">disconnect</button>
@@ -77,15 +86,17 @@ body {
   padding: 16px;
   border-radius: 24px;
   color: white;
+  display: flex;
+  flex-direction: column;
 
   button {
     padding: 8px 12px;
 
     &:first-child {
-      margin-left: 0;
+      margin-top: 0;
     }
 
-    margin-left: 4px;
+    margin-top: 4px;
     background: black;
     color: white;
     font-weight: bold;

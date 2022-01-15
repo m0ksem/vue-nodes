@@ -1,12 +1,9 @@
 <template>
   <div class="nodes-demo-header">
     <div class="nodes-demo-header__top">
-      <h1>Vue nodes demo</h1>
-
-      <p>Here some useful text</p>
+      <slot />
     </div>
     <div class="nodes-demo-header__bottom">
-      [Test]
     </div>
   </div>
 </template>
@@ -21,6 +18,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: 300px;
 
   h1 {
     margin: 0;

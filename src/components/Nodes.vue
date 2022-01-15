@@ -7,7 +7,7 @@ import { useSyncProp } from '../hooks/useSyncProp';
 import { useConnections } from '../hooks/useConnections';
 import type { Connection, Node } from '../types/'
 
-const emit = defineEmits(['update:nodes', 'update:hovered', 'update:selected', 'update:mouse'])
+const emit = defineEmits(['update:nodes', 'update:connections', 'update:mouse'])
 
 const props = defineProps({
   nodes: { type: Array as PropType<Node[]>, required: true },
@@ -15,8 +15,6 @@ const props = defineProps({
   // Preferences
   moveButton: { type: String as PropType<'right' | 'left' | 'middle'>, default: 'right' },
 })
-
-const connectionsProp = toRef(props, 'connections')
 
 const [syncNodes] = useSyncProp(props, 'nodes', emit)
 const [syncConnections] = useSyncProp(props, 'connections', emit)
@@ -71,8 +69,9 @@ const { connectFrom, connectTo, disconnect, connections, setConnectFromRef, setC
       position: absolute;
       height: 100%;
       width: 100%;
-      top: 0;
-      left: 0;
+      top: 50%;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
       z-index: -1;
     }
   }

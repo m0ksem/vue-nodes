@@ -63,8 +63,8 @@ const translateMouseCords = () => {
 
   &__content {
     position: absolute;
-    height: 500%;
-    width: 500%;
+    height: 100%;
+    width: 100%;
     left: 50%;
     top: 50%;
     transform-origin: 0 0 0;
