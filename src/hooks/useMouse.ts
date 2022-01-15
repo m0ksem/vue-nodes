@@ -28,7 +28,9 @@ export const useMouse = (target?: HTMLElement | Ref<HTMLElement>) => {
   }
 
   const mouseUpHandler = (e: MouseEvent) => {
-    buttons.value = { left: false, middle: false, right: false }
+    if (e.button === 1) { buttons.value.left = false; }
+    if (e.button === 4) { buttons.value.middle = false; }
+    if (e.button === 2) { buttons.value.right = false; }
   }
 
   const moveHandler = (e: MouseEvent) => {

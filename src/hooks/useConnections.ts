@@ -1,4 +1,4 @@
-import { ComponentPublicInstance, computed, Ref, ref, UnwrapRef } from 'vue'
+import { ComponentPublicInstance, computed, Ref, ref, UnwrapRef, watch } from 'vue'
 import type { Node, Point, RawConnection, ConnectionPoint, Connection } from '../types/'
 import { useMap } from './useMap'
 import { useMouse } from './useMouse'
@@ -15,7 +15,13 @@ export const useConnections = (
   connections: Ref<Connection[]>
 ) => {
   const newConnection = ref<Node | null>(null)
-  const { mouse } = useMouse(el)
+  const { mouse, buttons } = useMouse(el)
+
+  watch(buttons, (newButtons) => {
+    if (newButtons['right']) {
+      newConnection.value = null
+    }
+  }, { deep: true })
 
   const nodesMap = useMap<Node, {
     connectFrom?: HTMLElement
