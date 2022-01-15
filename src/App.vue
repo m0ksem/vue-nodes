@@ -1,12 +1,29 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import HelloWorld from './components/HelloWorld.vue'
+import NodesCanvas from './components/Nodes.vue'
+import { ref } from 'vue'
+
+const items = ref([
+  {
+    name: 'Hello!',
+    position: { x: 0, y: 0 }
+  },
+    {
+    name: 'Hello!',
+    position: { x: 100, y: 100 }
+  },
+])
 </script>
 
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <NodesCanvas v-model:nodes="items">
+    <template #node-content="{ node, disconnectListener, connectFromListeners, connectTargetListeners }">
+      {{ node.name }}
+
+      <button v-bind="connectFromListeners">connect from</button>
+      <button v-bind="connectTargetListeners">connect to</button>
+      <button v-bind="disconnectListener">disconnect</button>
+    </template>
+  </NodesCanvas>
 </template>
 
 <style>
@@ -16,6 +33,11 @@ import HelloWorld from './components/HelloWorld.vue'
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  width: 100vw;
+  height: 100vh;
+}
+
+body { 
+  margin: 0;
 }
 </style>
