@@ -5,8 +5,8 @@ import { useMouse } from './useMouse'
 
 
 export const useConnections = <D extends UnwrapRef<T>, T = any>(el: HTMLElement) => {
-  const connections = ref<(Connection<T> & { data: T })[]>([])
-  const newConnection = ref<Omit<Connection<T>, 'end'> | null>(null)
+  const connections = ref<(Connection & { data: T })[]>([])
+  const newConnection = ref<Omit<Connection, 'end'> | null>(null)
   const { mouse } = useMouse(el)
 
   const computedConnections = computed(() => {
