@@ -1,4 +1,4 @@
-import { onMounted, Ref, ref, unref } from "vue"
+import { computed, onMounted, Ref, ref, unref, watch } from "vue"
 
 type Options = {
   max?: number,
@@ -14,7 +14,7 @@ const defaultOptions = {
 
 export const useMouseScroll = (target?: HTMLElement | Ref<HTMLElement>, options?: Options) => {
   const scroll = ref(0)
-  const safeTarget = (unref(target) || window) as HTMLElement
+  const safeTarget = computed(() => (unref(target) || window) as HTMLElement) 
   const { max, min, speed} = { ...defaultOptions, ...options }
 
   const wheelHandler = (e: WheelEvent) => {
@@ -26,7 +26,12 @@ export const useMouseScroll = (target?: HTMLElement | Ref<HTMLElement>, options?
   }
 
   onMounted(() => {
-    safeTarget.addEventListener('wheel', wheelHandler);
+    safeTarget.value.addEventListener('wheel', wheelHandler);
+  })
+
+  watch(safeTarget, (newValue, oldValue) => {
+    oldValue.removeEventListener('wheel', wheelHandler);
+    newValue.addEventListener('wheel', wheelHandler);
   })
 
   return {

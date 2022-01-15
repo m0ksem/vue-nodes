@@ -11,7 +11,8 @@ const position = ref({ x: 0, y: 0 })
 
 const { mousemove, buttons, normalize } = useMouse()
 
-const { scroll } = useMouseScroll(undefined, { 
+const scrollWrapperRef = ref()
+const { scroll } = useMouseScroll(scrollWrapperRef, { 
   max: 0.7,
   min: 0,
   speed: 0.1
@@ -45,7 +46,7 @@ const translateMouseCords = () => {
 </script>
 
 <template>
-  <div class="nodes-scroll-wrapper">
+  <div class="nodes-scroll-wrapper" ref="scrollWrapperRef">
     <div class="nodes-scroll-wrapper__content" :style="scrollContentStyle">
       <slot v-bind="{ position, scale }"></slot>
     </div>
