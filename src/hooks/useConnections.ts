@@ -1,41 +1,61 @@
-import { computed, ref, UnwrapRef } from 'vue'
-import type { Node, Point, Connection, ConnectionPoint } from '../types/'
+import { ComponentPublicInstance, computed, Ref, ref, UnwrapRef } from 'vue'
+import type { Node, Point, RawConnection, ConnectionPoint, Connection } from '../types/'
+import { useMap } from './useMap'
 import { useMouse } from './useMouse'
 
+const safeHTMLElement = (el: Element | ComponentPublicInstance | null) => {
+  if (!el) { return undefined }
 
+  if ('$el' in el) return el.$el as HTMLElement
+  return el as HTMLElement
+}
 
-export const useConnections = <D extends UnwrapRef<T>, T = any>(el: HTMLElement) => {
-  const connections = ref<(Connection & { data: T })[]>([])
-  const newConnection = ref<Omit<Connection, 'end'> | null>(null)
+export const useConnections = (
+  el: HTMLElement, 
+  connections: Ref<Connection[]>
+) => {
+  const newConnection = ref<Node | null>(null)
   const { mouse } = useMouse(el)
 
-  const computedConnections = computed(() => {
-    const activeConnections = connections.value.map((con) => ({
-      start: con.start || 0,
-      end: con.end || 0
-    }))
+  const nodesMap = useMap<Node, {
+    connectFrom?: HTMLElement
+    connectTo?: HTMLElement,
+    disconnect?: HTMLElement
+  }>()
+
+  const computedConnections = computed<RawConnection[]>(() => {
+    const activeConnections = connections.value.map((con) => {
+      const startNodes = nodesMap.get(con.start)
+      const endNodes = nodesMap.get(con.end)
+  
+      return {
+        start: startNodes!.connectFrom!,
+        end: endNodes!.connectTo!
+      }
+    })
 
     if (newConnection.value) {
+      const newConnectionEl = nodesMap.get(newConnection.value)
+
       return [
         ...activeConnections,
-        { start: newConnection.value.start, end: mouse.value }
+        { start: newConnectionEl?.connectFrom!, end: mouse.value }
       ]
     }
 
     return activeConnections
   })
 
-  const connectFrom = (el: HTMLElement, data: D) => {
-    newConnection.value = { start: el }
+  const connectFrom = (node: Node) => {
+    newConnection.value = node
   }
 
-  const connectTo = (el: HTMLElement, data: D) => {
+  const connectTo = (node: Node) => {
     if (!newConnection.value) { return }
 
     connections.value.push({
-      start: newConnection.value.start,
-      end: el,
-      data,
+      start: newConnection.value,
+      end: node
     })
 
     newConnection.value = null
@@ -45,8 +65,16 @@ export const useConnections = <D extends UnwrapRef<T>, T = any>(el: HTMLElement)
     newConnection.value = null
   }
 
-  const disconnect = (data: D) => {
-    connections.value = connections.value.filter((con) => con.data !== data)
+  const disconnect = (node: Node) => {
+    connections.value = connections.value.filter((con) => con.end !== node)
+  }
+
+  const setConnectFromRef = (node: Node) => {
+    return (el: Element | ComponentPublicInstance | null) => { nodesMap.get(node, {}).connectFrom = safeHTMLElement(el) }
+  }
+
+  const setConnectToRef = (node: Node) => {
+    return (el: Element | ComponentPublicInstance | null) => { nodesMap.get(node, {}).connectTo = safeHTMLElement(el) }
   }
 
   return {
@@ -54,6 +82,8 @@ export const useConnections = <D extends UnwrapRef<T>, T = any>(el: HTMLElement)
     connectFrom,
     connectTo,
     undoNewConnection,
-    disconnect
+    disconnect,
+    setConnectFromRef,
+    setConnectToRef
   }
 }

@@ -18,12 +18,15 @@ const items = ref([
 <template>
   <DemoHeader />
   <NodesCanvas v-model:nodes="items">
-    <template #node-content="{ node, disconnectListener, connectFromListeners, connectTargetListeners }">
+    <template #node-content="{ 
+        node, disconnectListener, connectFromListeners, 
+        connectTargetListeners, setConnectFromRef, setConnectToRef, 
+      }">
       <div class="nodes-demo-item">
         {{ node.name }}
 
-        <button v-bind="connectFromListeners">connect from</button>
-        <button v-bind="connectTargetListeners">connect to</button>
+        <button v-bind="connectFromListeners" :ref="setConnectFromRef(node)">connect from</button>
+        <button v-bind="connectTargetListeners" :ref="setConnectToRef(node)">connect to</button>
         <button v-bind="disconnectListener">disconnect</button>
       </div>
     </template>

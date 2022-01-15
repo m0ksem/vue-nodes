@@ -2,22 +2,25 @@
 import ScrollWrapper from './ScrollWrapper.vue'
 import DraggableNodes from './DraggableNodes.vue';
 import ConnectionsCanvas from './ConnectionsCanvas.vue';
-import { PropType, ref } from 'vue'
+import { PropType, ref, toRef, unref } from 'vue'
 import { useSyncProp } from '../hooks/useSyncProp';
 import { useConnections } from '../hooks/useConnections';
-import type { Node } from '../types/'
+import type { Connection, Node } from '../types/'
 
 const emit = defineEmits(['update:nodes', 'update:hovered', 'update:selected', 'update:mouse'])
 
 const props = defineProps({
   nodes: { type: Array as PropType<Node[]>, required: true },
   moveButton: { type: String as PropType<'right' | 'left' | 'middle'>, default: 'right' },
+  connections: { type: Array as PropType<Connection[]>, default: () => [] }
 })
+
+const connectionsProp = toRef(props, 'connections')
 
 const [syncNodes] = useSyncProp(props, 'nodes', emit)
 
-const connectionsRef = ref()
-const { connectFrom, connectTo, disconnect, connections } = useConnections<Node>(connectionsRef.value)
+const connectionsRef = ref<HTMLElement>()
+const { connectFrom, connectTo, disconnect, connections, setConnectFromRef, setConnectToRef } = useConnections(connectionsRef.value!, connectionsProp)
 </script>
 
 <template>
@@ -26,23 +29,27 @@ const { connectFrom, connectTo, disconnect, connections } = useConnections<Node>
       <template #node="{ node, index, listeners }">
         <slot name="node" v-bind="{
           node, index, 
+          setConnectFromRef,
+          setConnectToRef,
           dragListeners: listeners,
           connectFromListeners: {
-            onclick: (e: MouseEvent) => connectFrom(e.target as HTMLElement, node)
+            onclick: (e: MouseEvent) => connectFrom(node)
           },
           connectTargetListeners: {
-            onclick: (e: MouseEvent) => connectTo(e.target as HTMLElement, node)
+            onclick: (e: MouseEvent) => connectTo(node)
           }
         }"/>
       </template>
       <template #node-content="{ node, index }">
         <slot name="node-content" v-bind="{
           node, index,
+          setConnectFromRef,
+          setConnectToRef,
           connectFromListeners: {
-            onclick: (e: MouseEvent) => connectFrom(e.target as HTMLElement, node)
+            onclick: (e: MouseEvent) => connectFrom(node)
           },
           connectTargetListeners: {
-            onclick: (e: MouseEvent) => connectTo(e.target as HTMLElement, node)
+            onclick: (e: MouseEvent) => connectTo(node)
           },
           disconnectListener: {
             onclick: () => disconnect(node)
