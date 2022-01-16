@@ -14,7 +14,7 @@ const useHook = () => {
   return { create, call }
 }
 
-export const useMouse = (target?: HTMLElement | Ref<HTMLElement>) => {
+export const useMouse = (target?: HTMLElement | Ref<HTMLElement> | Window) => {
   const mouse = ref({ x: 0, y: 0 })
   const mousemove = ref({ x: 0, y: 0 })
   const buttons = ref({ left: false, middle: false, right: false })

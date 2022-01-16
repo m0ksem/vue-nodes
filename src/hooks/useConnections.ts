@@ -1,6 +1,5 @@
 import { ComponentPublicInstance, computed, Ref, ref, UnwrapRef, watch } from 'vue'
-import type { Node, Point, RawConnection, ConnectionPoint, Connection } from '../types/'
-import { useMap } from './useMap'
+import { Connection, Point, VueRef, Node,  RawConnection, NodePointName, NodePoint, ConnectionPointSource } from '../types/'
 import { useMouse } from './useMouse'
 
 const safeHTMLElement = (el: Element | ComponentPublicInstance | null) => {
@@ -10,88 +9,129 @@ const safeHTMLElement = (el: Element | ComponentPublicInstance | null) => {
   return el as HTMLElement
 }
 
-export const useConnections = (
-  el: HTMLElement, 
-  connections: Ref<Connection[]>
-) => {
-  const newConnection = ref<Node | null>(null)
-  const { mouse, buttons } = useMouse(el)
+export const useConnectionRender = (connections: Ref<Connection[]>, el: HTMLElement | Ref<HTMLElement> | Window = window) => {
+  const { mouse } = useMouse(el)
 
-  watch(buttons, (newButtons) => {
-    if (newButtons['right']) {
-      newConnection.value = null
-    }
-  }, { deep: true })
+  const getNodePoint = (node: Node, pointName: string): HTMLElement | Point | null => {
+    const point = node.points[pointName]
 
-  const nodesMap = useMap<Node, {
-    connectFrom?: HTMLElement
-    connectTo?: HTMLElement,
-    disconnect?: HTMLElement
-  }>()
+    if (!point) { throw new Error(`Point ${pointName} not found in ${node}`) }
 
-  const computedConnections = computed<RawConnection[]>(() => {
-    const activeConnections = connections.value.map((con) => {
-      const startNodes = nodesMap.get(con.start)
-      const endNodes = nodesMap.get(con.end)
+    if (!point.el) { return null }
 
-      if (!startNodes || !endNodes) { return null }
-  
-      return {
-        start: startNodes.connectFrom!,
-        end: endNodes.connectTo!
-      }
-    }).filter((c) => c !== null) as RawConnection[]
+    return point.el
+  }
 
+  const transformConnection = (point: ConnectionPointSource) => {
+    if (point === NodePoint.Mouse) {
+      return mouse.value
+    }      
+
+    return getNodePoint(point.node, point.point)
+  }
+
+  const generatePoints = (connections: Connection[]): RawConnection[] => {
+    return connections.map(({ start, end }) => ({
+      start: transformConnection(start) || { x: 0, y: 0},
+      end: transformConnection(end) || { x: 0, y: 0 }
+    }))
+  }
+
+  const connectionPoints = computed(() => generatePoints(connections.value))
+
+  return {
+    connectionPoints
+  }
+}
+
+export const useConnections = (connections: Ref<Connection[]>) => {
+  const registerPoint = (node: Node, point: NodePointName) => (el: VueRef) => {
+    node.points[point].el = safeHTMLElement(el)
+  }
+
+  const compareConnection = (connection: ConnectionPointSource, node: Node, point: NodePointName) => {
+    if (typeof connection === 'string') { return false }
+    
+    return connection.node === node && connection.point === point
+  }
+
+  const getConnectionStart = (node: Node, point: NodePointName) => connections.value
+    .find(({ start }) => compareConnection(start, node, point))
+
+  const getConnectionEnd = (node: Node, point: NodePointName) =>  connections.value
+    .find(({ start }) => compareConnection(start, node, point))
+
+  const getConnection = (node: Node, point: NodePointName) =>
+    getConnectionStart(node, point) || getConnectionEnd(node, point)
+
+  const searchConnection = (startNode?: Node, startPoint?: NodePointName, endNode?: Node, endPoint?: NodePointName) => {
+    return connections.value
+      .find(({ start, end }) => typeof start !== 'string' && typeof end !== 'string' &&
+        (!startNode || startNode === start.node) &&
+        (!startPoint || startPoint === start.point) &&
+        (!endNode || endNode === end.node) &&
+        (!endPoint || endPoint === end.point)
+      )
+  }
+
+  const newConnection = ref<Connection>()
+
+  const undoConnectFrom = () => {
+    connections.value = connections.value.filter((c) => c !== newConnection.value)
+    newConnection.value = undefined
+  }
+
+  const connectFrom = (node: Node, point: NodePointName) => {
     if (newConnection.value) {
-      const newConnectionEl = nodesMap.get(newConnection.value)
-
-      return [
-        ...activeConnections,
-        { start: newConnectionEl?.connectFrom!, end: mouse.value }
-      ]
+      undoConnectFrom()
     }
 
-    return activeConnections
-  })
+    newConnection.value = {
+      start: { node, point },
+      end: NodePoint.Mouse
+    }
 
-  const connectFrom = (node: Node) => {
-    newConnection.value = node
+    connections.value.push(newConnection.value)
   }
 
-  const connectTo = (node: Node) => {
+  const connectTo = (node: Node, point: NodePointName) => {
     if (!newConnection.value) { return }
-
-    connections.value.push({
-      start: newConnection.value,
-      end: node
-    })
-
-    newConnection.value = null
+    newConnection.value.end = { node, point }
+    newConnection.value = undefined
   }
 
-  const undoNewConnection = () => {
-    newConnection.value = null
+  const disconnect = (node1: Node, point1: NodePointName, node2: Node, point2: NodePointName) => {
+    connections.value = connections.value.filter(({ start, end }) => 
+      !(compareConnection(start, node1, point1) && compareConnection(end, node2, point2))
+    )
   }
 
-  const disconnect = (node: Node) => {
-    connections.value = connections.value.filter((con) => con.end !== node)
+  const disconnectSymmetric = (node1: Node, point1: NodePointName, node2: Node, point2: NodePointName) => {
+    connections.value = connections.value.filter(({ start, end }) => 
+      !(compareConnection(start, node1, point1) && compareConnection(end, node2, point2)) &&
+      !(compareConnection(start, node2, point2) && compareConnection(end, node1, point1))
+    )
   }
 
-  const setConnectFromRef = (node: Node) => {
-    return (el: Element | ComponentPublicInstance | null) => { nodesMap.get(node, {}).connectFrom = safeHTMLElement(el) }
+  const disconnectStart = (node: Node, point: NodePointName,) => {
+    connections.value = connections.value.filter(({ start }) => !(compareConnection(start, node, point)))
   }
 
-  const setConnectToRef = (node: Node) => {
-    return (el: Element | ComponentPublicInstance | null) => { nodesMap.get(node, {}).connectTo = safeHTMLElement(el) }
+  const disconnectEnd = (node: Node, point: NodePointName,) => {
+    connections.value = connections.value.filter(({ end }) => !(compareConnection(end, node, point)))
   }
 
   return {
-    connections: computedConnections,
+    registerPoint,
+    getConnection,
+    getConnectionStart,
+    getConnectionEnd,
     connectFrom,
     connectTo,
-    undoNewConnection,
     disconnect,
-    setConnectFromRef,
-    setConnectToRef
+    disconnectSymmetric,
+    disconnectStart,
+    disconnectEnd,
+    searchConnection
   }
 }

@@ -16,7 +16,8 @@ const canvas = ref<HTMLCanvasElement>()
 const context = ref<CanvasRenderingContext2D>()
 
 const getVueElement = (comp: any): HTMLElement => {
-  if ('$el' in comp) return comp.$el
+  if ('$el' in comp || comp.$el !== undefined) return comp.$el
+
   return comp
 }
 

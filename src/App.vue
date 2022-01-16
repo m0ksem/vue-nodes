@@ -1,54 +1,139 @@
 <script setup lang="ts">
 import NodesCanvas from './components/Nodes.vue'
 import DemoHeader from './components/demo/DemoHeader.vue';
+import DemoNode from './components/demo/DemoNode.vue'
+import DemoButton from './components/demo/DemoButton.vue'
 import { computed, ref } from 'vue'
-import { useConnectionsPath } from './hooks/useConnectionsPath'
+import { useConnections } from './hooks/useConnections'
+import { Connection, Node } from './types';
 
-const items = ref([
-  { position: { x: 0, y: 0 }, color: '#00fffc' },
-  { position: { x: -200, y: 100 }, color: '#fc00ff', },
-  { position: { x: 105, y: 200 }, color: '#fffc00' },
-  { position: { x: 205, y: -200 }, color: '#6AB547' },
-  { position: { x: 305, y: 0 }, color: '#63326E' },
-])
-
-const connections = ref([
+const items = ref<Node[]>([
   {
-    start: items.value[0],
-    end: items.value[1]
-  }
+    position: { x: -300, y: -100 }, 
+    math: 'input',
+    title: 'Number',
+    points: {
+      'output': { type: 'output' },
+    },
+    value: 0,
+  },
+    {
+    position: { x: -300, y: 100 }, 
+    math: 'input',
+    title: 'Number',
+    points: {
+      'output': { type: 'output' },
+    },
+    value: 0,
+  },
+  {
+    position: { x: 0, y: 100 }, 
+    math: '+',
+    title: 'Sum',
+    points: {
+      'input1': { type: 'input', title: 'Number' },
+      'input2': { type: 'input', title: 'Number' },
+      'output': { type: 'output' },
+    }
+  },
+  {
+    position: { x: 0, y: -100 }, 
+    math: '*',
+    title: 'Mul',
+    points: {
+      'input1': { type: 'input', title: 'Number' },
+      'input2': { type: 'input', title: 'Number' },
+      'output': { type: 'output' },
+    }
+  },
+  {
+    position: { x: 150, y: 0 }, 
+    math: 'print',
+    title: 'Output',
+    points: {
+      'input': { type: 'input' },
+    }
+  },
 ])
 
-const { generateCircularPath } = useConnectionsPath(connections)
+const connections = ref<Connection[]>([])
 
-const path = computed(() => generateCircularPath())
+const { registerPoint, connectFrom, connectTo, searchConnection, disconnectEnd } = useConnections(connections)
 
-const gradientStyle = computed(() => {
-  if (path.value.length === 1) { return `linear-gradient(40deg, #fff 0%, #fff 100%)`}
+const calculate = () => {
+  const start = connections.value.find((c) => typeof c.end !== 'string' && c.end.node.math === 'print')
 
-  const colors = path.value
-    .map((cur, index) => `${cur.color} ${index * (100 / (path.value.length - 1))}%`).join(', ')
+  const getRecursiveResult = (connection: Connection | undefined): undefined | number => {
+    if (connection === undefined) { return 0 }
 
-  return `linear-gradient(40deg, ${colors})`
+    if (typeof connection.end === 'string' || typeof connection.start === 'string') { return 0 }
+
+    const start = connection.start.node
+
+    if (start.math === '+') {
+      const input1 = getRecursiveResult(searchConnection(undefined, 'output', start, 'input1'))
+      const input2 = getRecursiveResult(searchConnection(undefined, 'output', start, 'input2'))
+
+      if (input1 === undefined || input2 === undefined) { return 0 }
+
+      return Number(input1) + Number(input2)
+    }
+
+    if (start.math === '*') {
+      const input1 = getRecursiveResult(searchConnection(undefined, 'output', start, 'input1'))
+      const input2 = getRecursiveResult(searchConnection(undefined, 'output', start, 'input2'))
+
+      if (input1 === undefined || input2 === undefined) { return 0 }
+
+      return Number(input1) * Number(input2)
+    }
+
+    if (start.math === 'input') {
+      return start.value
+    }
+  }
+
+  return getRecursiveResult(start)
 }
 
-)
+const result = computed(() => calculate())
 </script>
 
 <template>
   <DemoHeader>
-    <h1 :style="{ backgroundImage: gradientStyle }">Vue nodes demo</h1>
+    <h1>Vue nodes demo</h1>
   </DemoHeader>
   <NodesCanvas v-model:nodes="items" v-model:connections="connections">
-    <template #node-content="{ 
-        node, disconnectListener, connectFromListeners, 
-        connectTargetListeners, setConnectFromRef, setConnectToRef, 
-      }">
-      <div class="nodes-demo-item" :style="{ background: node.color }">
-        <button v-bind="connectFromListeners" :ref="setConnectFromRef(node)">connect from</button>
-        <button v-bind="connectTargetListeners" :ref="setConnectToRef(node)">connect to</button>
-        <button v-bind="disconnectListener">disconnect</button>
-      </div>
+    <template #node-content="{ node }">
+      <DemoNode :title="node.title">
+        <template #inputs>
+          <template v-for="(point, pointName) in node.points" :key="pointName">
+            <DemoButton
+              v-if="point.type === 'input'"
+              @register-point="registerPoint(node, pointName)($event)"
+              @circle-click="disconnectEnd(node, pointName); connectTo(node, pointName)"
+              color="#ffbb55"
+              :title="point.title"
+            />        
+          </template>
+        </template>
+
+        <input v-if="node.value !== undefined" v-model="node.value" />
+        <div v-if="node.math === 'print'">{{ result }}</div>
+
+        <template #outputs>
+          <template v-for="(point, pointName) in node.points" :key="pointName">
+            <DemoButton
+              v-if="point.type === 'output'"
+              @register-point="registerPoint(node, pointName)($event)"
+              @circle-click="connectFrom(node, pointName)"
+              color="#137261"
+              :title="point.title"
+              right
+            />         
+          </template>
+        </template>
+      </DemoNode>
     </template>
   </NodesCanvas>
 </template>
@@ -75,33 +160,33 @@ body {
   flex: 1;
 }
 
-.nodes-demo-item {
-  cursor: pointer;
-  background-image: linear-gradient(
-        40deg,
-        #00fffc 0%,
-        #fc00ff 45%,
-        #fffc00 100%
-      );
-  padding: 16px;
-  border-radius: 24px;
-  color: white;
-  display: flex;
-  flex-direction: column;
+// .nodes-demo-item {
+//   cursor: pointer;
+//   background-image: linear-gradient(
+//         40deg,
+//         #00fffc 0%,
+//         #fc00ff 45%,
+//         #fffc00 100%
+//       );
+//   padding: 16px;
+//   border-radius: 24px;
+//   color: white;
+//   display: flex;
+//   flex-direction: column;
 
-  button {
-    padding: 8px 12px;
+//   button {
+//     padding: 8px 12px;
 
-    &:first-child {
-      margin-top: 0;
-    }
+//     &:first-child {
+//       margin-top: 0;
+//     }
 
-    margin-top: 4px;
-    background: black;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 4px;
-  }
-}
+//     margin-top: 4px;
+//     background: black;
+//     color: white;
+//     font-weight: bold;
+//     border: none;
+//     border-radius: 4px;
+//   }
+// }
 </style>

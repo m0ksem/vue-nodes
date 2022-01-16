@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 300px;
+  width: 350px;
 
   h1 {
     margin: 0;
@@ -28,6 +28,7 @@
         #fc00ff 45%,
         #fffc00 100%
       );
+    text-align: center;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
