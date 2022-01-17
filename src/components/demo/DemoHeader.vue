@@ -4,6 +4,7 @@
       <slot />
     </div>
     <div class="nodes-demo-header__bottom">
+      <a href="https://github.com/m0ksem/vue-nodes">Github</a>
     </div>
   </div>
 </template>
@@ -31,6 +32,18 @@
     text-align: center;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+  }
+
+  a {
+    color: #00fffc;
+    background-image: linear-gradient(
+      40deg,
+      #00fffc 0%,
+      #fffc00 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-decoration: none;
   }
 }
 </style>

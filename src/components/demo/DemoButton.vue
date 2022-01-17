@@ -21,11 +21,11 @@ watch(circleRef, (newVal) => {
 <template>
   <div class="demo-button" :class="{ 'demo-button--right': right }">
     <template v-if="right">
-      {{ title }}
+      <slot>{{ title }}</slot>
     </template>
     <div class="demo-button__circle" @click="$emit('circle-click')" :style="{ background: color }" ref="circleRef" />
     <template v-if="!right">
-      {{ title }}
+      <slot>{{ title }}</slot>
     </template>
   </div>
 </template>
@@ -34,6 +34,7 @@ watch(circleRef, (newVal) => {
 .demo-button {
   margin-bottom: 8px;
   display: flex;
+  align-items: center;
 
   &:last-child {
     margin-bottom: 0;
@@ -52,7 +53,7 @@ watch(circleRef, (newVal) => {
     .demo-button {
       &__circle {
         margin-right: -16px;
-        margin-left: 0;
+        margin-left: 8px;
       }
     }
   }

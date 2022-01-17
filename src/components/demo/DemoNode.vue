@@ -27,7 +27,7 @@ const props = defineProps({
 
 <style lang="scss">
   .demo-node {
-    background: #141818;
+    background: linear-gradient(116deg, #232526, #414345);
     color: #ffffff;
     display: flex;
     border-radius: 5px;
@@ -35,7 +35,7 @@ const props = defineProps({
     flex-direction: column;
 
     &__header {
-      background: #30373e;
+      background: linear-gradient(35deg, #2193b0, #6dd5ed);
       color: white;
       padding: 8px;
       cursor: pointer;
@@ -46,7 +46,8 @@ const props = defineProps({
     &__main {
       display: flex;
       justify-content: space-between;
-      padding: 8px;
+      padding: 12px 8px;
+      font-size: 14px;
     }
 
     &__inputs, &__outputs {
@@ -65,6 +66,14 @@ const props = defineProps({
     &__content {
       width: 100%;
       text-align: left;
+    }
+
+    input {
+      padding: 4px 8px;
+      background: linear-gradient(243deg, #8e2de2, #4a00e0);
+      border: none;
+      color: white;
+      border-radius: 4px;
     }
   }
 </style>

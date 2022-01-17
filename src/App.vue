@@ -102,7 +102,13 @@ const result = computed(() => calculate())
 <template>
   <DemoHeader>
     <h1>Vue nodes demo</h1>
+
+    <p>This is a math example, where you can create math expressions.</p>
+
+    <p>You have two "Number" inputs and can connect them trough math nodes.</p>
+
   </DemoHeader>
+
   <NodesCanvas v-model:nodes="items" v-model:connections="connections">
     <template #node-content="{ node }">
       <DemoNode :title="node.title">
@@ -112,14 +118,13 @@ const result = computed(() => calculate())
               v-if="point.type === 'input'"
               @register-point="registerPoint(node, pointName)($event)"
               @circle-click="disconnectEnd(node, pointName); connectTo(node, pointName)"
-              color="#ffbb55"
+              color="linear-gradient(145deg, #ff4e50, #f9d423)"
               :title="point.title"
-            />        
+            >
+              <div v-if="node.math === 'print'">{{ result }}</div>
+            </DemoButton>     
           </template>
         </template>
-
-        <input v-if="node.value !== undefined" v-model="node.value" />
-        <div v-if="node.math === 'print'">{{ result }}</div>
 
         <template #outputs>
           <template v-for="(point, pointName) in node.points" :key="pointName">
@@ -127,10 +132,12 @@ const result = computed(() => calculate())
               v-if="point.type === 'output'"
               @register-point="registerPoint(node, pointName)($event)"
               @circle-click="connectFrom(node, pointName)"
-              color="#137261"
+              color="linear-gradient(to right, #1d976c, #93f9b9)"
               :title="point.title"
               right
-            />         
+            >     
+              <input v-if="node.value !== undefined" v-model="node.value" />
+            </DemoButton>    
           </template>
         </template>
       </DemoNode>
@@ -147,7 +154,7 @@ const result = computed(() => calculate())
   color: #2c3e50;
   width: 100vw;
   height: 100vh;
-  background-image: linear-gradient(153deg, #d1e2ff 0%, #e0bafa 50%, #9e81ce 100%);
+  background: linear-gradient(114deg, #a770ef, #cf8bf3, #fdb99b);
   font-weight: bold;
   display: flex;
 }
