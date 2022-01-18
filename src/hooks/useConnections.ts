@@ -1,5 +1,5 @@
 import { ComponentPublicInstance, computed, Ref, ref, UnwrapRef, watch } from 'vue'
-import { Connection, Point, VueRef, Node,  RawConnection, NodePointName, NodePoint, ConnectionPointSource } from '../types/'
+import { Connection, Point, VueRef, Node,  RawConnection, NodePointName, NodePoint, ConnectionPointSource, NodeAndPoint, ConnectionWithoutPreset } from '../types/'
 import { useMouse } from './useMouse'
 
 const safeHTMLElement = (el: Element | ComponentPublicInstance | null) => {
@@ -44,27 +44,29 @@ export const useConnectionRender = (connections: Ref<Connection[]>, el: HTMLElem
   }
 }
 
-export const useConnections = (connections: Ref<Connection[]>) => {
-  const registerPoint = (node: Node, point: NodePointName) => (el: VueRef) => {
+export const useConnections = <NodeSubType = {}>(connections: Ref<Connection<NodeSubType>[]>) => {
+  const registerPoint = (node: Node<NodeSubType>, point: NodePointName) => (el: VueRef) => {
     node.points[point].el = safeHTMLElement(el)
   }
 
-  const compareConnection = (connection: ConnectionPointSource, node: Node, point: NodePointName) => {
+  const compareConnection = (connection: ConnectionPointSource, node: Node<NodeSubType>, point?: NodePointName) => {
     if (typeof connection === 'string') { return false }
+
+    if (!point) { return connection.node === node }
     
     return connection.node === node && connection.point === point
   }
 
-  const getConnectionStart = (node: Node, point: NodePointName) => connections.value
+  const getConnectionStart = (node: Node<NodeSubType>, point?: NodePointName) => connections.value
     .find(({ start }) => compareConnection(start, node, point))
 
-  const getConnectionEnd = (node: Node, point: NodePointName) =>  connections.value
+  const getConnectionEnd = (node: Node<NodeSubType>, point?: NodePointName) =>  connections.value
     .find(({ start }) => compareConnection(start, node, point))
 
-  const getConnection = (node: Node, point: NodePointName) =>
+  const getConnection = (node: Node<NodeSubType>, point?: NodePointName) =>
     getConnectionStart(node, point) || getConnectionEnd(node, point)
 
-  const searchConnection = (startNode?: Node, startPoint?: NodePointName, endNode?: Node, endPoint?: NodePointName) => {
+  const searchConnection = (startNode?: Node<NodeSubType>, startPoint?: NodePointName, endNode?: Node<NodeSubType>, endPoint?: NodePointName) => {
     return connections.value
       .find(({ start, end }) => typeof start !== 'string' && typeof end !== 'string' &&
         (!startNode || startNode === start.node) &&
@@ -74,14 +76,17 @@ export const useConnections = (connections: Ref<Connection[]>) => {
       )
   }
 
-  const newConnection = ref<Connection>()
+  const findConnection = (cb: (con: ConnectionWithoutPreset<NodeSubType>) => boolean) => 
+    connections.value.find((con) => typeof con.end !== 'string' && typeof con.start !== 'string' && cb(con as ConnectionWithoutPreset<NodeSubType>))
+
+  const newConnection = ref<Connection<NodeSubType>>()
 
   const undoConnectFrom = () => {
     connections.value = connections.value.filter((c) => c !== newConnection.value)
     newConnection.value = undefined
   }
 
-  const connectFrom = (node: Node, point: NodePointName) => {
+  const connectFrom = (node: Node<NodeSubType>, point: NodePointName) => {
     if (newConnection.value) {
       undoConnectFrom()
     }
@@ -94,31 +99,60 @@ export const useConnections = (connections: Ref<Connection[]>) => {
     connections.value.push(newConnection.value)
   }
 
-  const connectTo = (node: Node, point: NodePointName) => {
+  const connectTo = (node: Node<NodeSubType>, point: NodePointName) => {
+    disconnectEnd(node, point)
     if (!newConnection.value) { return }
     newConnection.value.end = { node, point }
     newConnection.value = undefined
   }
 
-  const disconnect = (node1: Node, point1: NodePointName, node2: Node, point2: NodePointName) => {
+  const disconnect = (node1: Node<NodeSubType>, point1: NodePointName, node2: Node<NodeSubType>, point2: NodePointName) => {
     connections.value = connections.value.filter(({ start, end }) => 
       !(compareConnection(start, node1, point1) && compareConnection(end, node2, point2))
     )
   }
 
-  const disconnectSymmetric = (node1: Node, point1: NodePointName, node2: Node, point2: NodePointName) => {
+  const disconnectSymmetric = (node1: Node<NodeSubType>, point1: NodePointName, node2: Node<NodeSubType>, point2: NodePointName) => {
     connections.value = connections.value.filter(({ start, end }) => 
       !(compareConnection(start, node1, point1) && compareConnection(end, node2, point2)) &&
       !(compareConnection(start, node2, point2) && compareConnection(end, node1, point1))
     )
   }
 
-  const disconnectStart = (node: Node, point: NodePointName,) => {
+  const disconnectStart = (node: Node<NodeSubType>, point: NodePointName,) => {
     connections.value = connections.value.filter(({ start }) => !(compareConnection(start, node, point)))
   }
 
-  const disconnectEnd = (node: Node, point: NodePointName,) => {
+  const disconnectEnd = (node: Node<NodeSubType>, point: NodePointName,) => {
     connections.value = connections.value.filter(({ end }) => !(compareConnection(end, node, point)))
+  }
+
+  const recursivePath = <T>(
+    searchFn: (current: NodeAndPoint<NodeSubType>, next: (pointName?: string) => undefined | T, first: NodeAndPoint<NodeSubType>) => T | undefined, 
+    notFoundValue: T, 
+    start?: Connection<NodeSubType>
+  ) => {
+    start = start || connections.value.concat().reverse().find((c) => typeof c.end !== 'string')
+
+    if (!start) { return notFoundValue }
+
+    const getRecursiveResult = (connection: Connection<NodeSubType> | undefined): undefined | T => {
+      if (connection === undefined) { return notFoundValue }
+      
+      if (typeof connection.end === 'string' || typeof connection.start === 'string') { return notFoundValue }
+
+      const s = connection.start as NodeAndPoint<NodeSubType>
+ 
+      const next = (pointName?: string) => getRecursiveResult(searchConnection(undefined, undefined, s.node, pointName))
+    
+      return searchFn(s, next, start!.end as NodeAndPoint<NodeSubType>)
+    }
+  
+    return getRecursiveResult(start)
+  }
+
+  const isNodeConnection = (connection: Connection<NodeSubType>): connection is ConnectionWithoutPreset<NodeSubType> => {
+    return typeof connection.end !== 'string' && typeof connection.start !== 'string'
   }
 
   return {
@@ -132,6 +166,9 @@ export const useConnections = (connections: Ref<Connection[]>) => {
     disconnectSymmetric,
     disconnectStart,
     disconnectEnd,
-    searchConnection
+    searchConnection,
+    findConnection,
+    recursivePath,
+    isNodeConnection
   }
 }

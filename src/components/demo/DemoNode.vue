@@ -67,13 +67,5 @@ const props = defineProps({
       width: 100%;
       text-align: left;
     }
-
-    input {
-      padding: 4px 8px;
-      background: linear-gradient(243deg, #8e2de2, #4a00e0);
-      border: none;
-      color: white;
-      border-radius: 4px;
-    }
   }
 </style>

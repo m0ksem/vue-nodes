@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@m0ksem/vue-glsl": "^0.0.1",
     "vue": "^3.2.25"
   },
   "devDependencies": {

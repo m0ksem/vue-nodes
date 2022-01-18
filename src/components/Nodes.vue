@@ -1,26 +1,36 @@
-<script setup lang="ts">
+<script lang="ts">
 import ScrollWrapper from './ScrollWrapper.vue'
 import DraggableNodes from './DraggableNodes.vue';
 import ConnectionsCanvas from './ConnectionsCanvas.vue';
-import { PropType, ref, toRef, unref } from 'vue'
+import { defineComponent, PropType, ref, toRef, unref } from 'vue'
 import { useSyncProp } from '../hooks/useSyncProp';
 import { useConnectionRender } from '../hooks/useConnections';
 import type { Connection, Node } from '../types/'
 
-const emit = defineEmits(['update:nodes', 'update:connections', 'update:mouse'])
+export default defineComponent({
+  components: { ScrollWrapper, DraggableNodes, ConnectionsCanvas },
 
-const props = defineProps({
-  nodes: { type: Array as PropType<Node[]>, required: true },
-  connections: { type: Array as PropType<Connection[]>, required: true },
-  // Preferences
-  moveButton: { type: String as PropType<'right' | 'left' | 'middle'>, default: 'right' },
+  props: {
+    nodes: { type: Array as PropType<Node[]>, required: true },
+    connections: { type: Array as PropType<Connection[]>, required: true },
+    // Preferences
+    moveButton: { type: String as PropType<'right' | 'left' | 'middle'>, default: 'right' },
+  },
+
+  emits: ['update:nodes', 'update:connections', 'update:mouse'],
+
+  setup(props, { emit }) {
+    const [syncNodes] = useSyncProp(props, 'nodes', emit)
+    const [syncConnections] = useSyncProp(props, 'connections', emit)
+
+    const connectionsRef = ref<HTMLElement>()
+    const { connectionPoints } = useConnectionRender(syncConnections, connectionsRef.value!)
+
+    return {
+      syncNodes, connectionPoints
+    }
+  }
 })
-
-const [syncNodes] = useSyncProp(props, 'nodes', emit)
-const [syncConnections] = useSyncProp(props, 'connections', emit)
-
-const connectionsRef = ref<HTMLElement>()
-const { connectionPoints } = useConnectionRender(syncConnections, connectionsRef.value!)
 </script>
 
 <template>

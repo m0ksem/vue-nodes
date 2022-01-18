@@ -39,6 +39,13 @@
   resolved "https://registry.yarnpkg.com/@emmetio/scanner/-/scanner-1.0.0.tgz#065b2af6233fe7474d44823e3deb89724af42b5f"
   integrity sha512-8HqW8EVqjnCmWXVpqAOZf+EGESdkR27odcMMMGefgKXtar00SoYNSryGv//TELI4T3QFsECo78p+0lmalk/CFA==
 
+"@m0ksem/vue-glsl@^0.0.1":
+  version "0.0.1"
+  resolved "https://npm.pkg.github.com/download/@m0ksem/vue-glsl/0.0.1/fbd4eb7ac241f37a790c42e7bc45fb4e448ba5e3ee7e47d9cb267bd2cd0fa369#b7d0353f23b032441e925598835002b8329cbe25"
+  integrity sha512-GYXmgv7Mx6g/9U6gI8QxnR/JUj+cwcAJI/OBmr9AQvOYQzb3aasjL5EEycf1VsWB1Jm897uRYlo51DPcp6y4RA==
+  dependencies:
+    vue-demi "^0.12.1"
+
 "@vitejs/plugin-vue@^2.0.0":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@vitejs/plugin-vue/-/plugin-vue-2.0.1.tgz#db0e5eacf96358e04cc501c9008079b25a70a4ac"
@@ -1011,6 +1018,11 @@ vscode-vue-languageservice@0.29.8:
     vscode-languageserver-textdocument "^1.0.1"
     vscode-pug-languageservice "0.29.8"
     vscode-typescript-languageservice "0.29.8"
+
+vue-demi@^0.12.1:
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.12.1.tgz#f7e18efbecffd11ab069d1472d7a06e319b4174c"
+  integrity sha512-QL3ny+wX8c6Xm1/EZylbgzdoDolye+VpCXRhI2hug9dJTP3OUJ3lmiKN3CsVV3mOJKwFi0nsstbgob0vG7aoIw==
 
 vue-tsc@^0.29.8:
   version "0.29.8"

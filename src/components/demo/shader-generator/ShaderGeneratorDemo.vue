@@ -3,26 +3,31 @@ import NodesCanvas from '../../Nodes.vue'
 import DemoHeader from '../DemoHeader.vue';
 import { computed, ref } from 'vue'
 import { useConnections } from '../../../hooks/useConnections';
-import type { ShaderGeneratorNode, Connection } from './types';
+import type { ShaderGeneratorNode, Connection, Node } from './types';
 import OutNode from './nodes/Out.vue'
 import SourceNode from './nodes/Source.vue'
 import ColorNode from './nodes/Color.vue'
+import Fragment from './nodes/Fragment.vue';
+import Vec4 from './nodes/Vec4.vue'
+import Variable from './nodes/Variable.vue'
+import Time from './nodes/Time.vue'
 
 const items = ref<ShaderGeneratorNode[]>([
-  // {
-  //   position: { x: 0, y: 0 },
-  //   type: 'out',
-  //   title: 'Out',
-  //   points: {
-  //     input: {}
-  //   }
-  // },
+  {
+    position: { x: 0, y: 0 },
+    type: 'out',
+    title: 'Out',
+    points: {
+      input: {}
+    }
+  },
   {
     position: { x: 0, y: 0 },
     type: 'source',
     title: 'Source',
     points: {
-      input: {}
+      input: {},
+      out: {}
     }
   },
   {
@@ -35,7 +40,53 @@ const items = ref<ShaderGeneratorNode[]>([
       b: { default: 0, value: 0 },
       out: {}
     }
-  }
+  },
+  {
+    position: { x: 0, y: 200 },
+    type: 'fragment',
+    title: 'Fragment Shader',
+    points: {
+      input: {},
+      out: {}
+    }
+  },
+  {
+    position: { x: -350, y: 0 },
+    type: 'vec4',
+    title: 'Vec4',
+    points: {
+      x: { default: 0, value: 0 },
+      y: { default: 0, value: 0 },
+      z: { default: 0, value: 0 },
+      w: { default: 0, value: 0 },
+      out: {}
+    }
+  },
+  {
+    position: { x: 0, y: 500 },
+    type: 'variable',
+    title: 'Var',
+    variable: {
+      value: 0,
+      type: 'float'
+    },
+    points: {
+      in: {},
+      out: {}
+    }
+  },
+  {
+    position: { x: 0, y: -300 },
+    type: 'time',
+    title: 'Time',
+    variable: {
+      value: 0,
+    },
+    points: {
+      in: {},
+      out: {}
+    }
+  },
 ])
 
 const connections = ref<Connection<ShaderGeneratorNode>[]>([])
@@ -60,14 +111,14 @@ void main() {
     </DemoHeader>
 
     <NodesCanvas v-model:nodes="items" v-model:connections="connections">
-      <template #node-content="{ node: node }">
+      <template #node-content="{ node }">
         <OutNode 
           v-if="node.type === 'out'" 
-          :shader="shader" 
           :node="(node as ShaderGeneratorNode)"
           :register-point="registerPoint"
-          @circle-click="connectFrom(node as ShaderGeneratorNode, $event[0])"
-          @connect-to="connectTo(node as ShaderGeneratorNode, $event)"
+          :connections="connections"
+          @circle-click="connectFrom((node as ShaderGeneratorNode) , $event[0])"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
         />
         <SourceNode 
           v-if="node.type === 'source'" 
@@ -75,12 +126,37 @@ void main() {
           :node="(node as ShaderGeneratorNode)"
           :register-point="registerPoint"
           :connections="connections"
-          @connect-to="connectTo(node, $event)"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
           />
         <ColorNode
           v-if="node.type === 'color'" :node="(node as ShaderGeneratorNode)"
           :register-point="registerPoint"
-          @connect-from="connectFrom(node, $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
+        />
+        <Fragment
+          v-if="node.type === 'fragment'" :node="(node as ShaderGeneratorNode)"
+          :register-point="registerPoint"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
+        />
+        <Vec4
+          v-if="node.type === 'vec4'" :node="(node as ShaderGeneratorNode)"
+          :register-point="registerPoint"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
+        />
+        <Variable 
+          v-if="node.type === 'variable'" :node="(node as ShaderGeneratorNode)"
+          :register-point="registerPoint"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
+        />
+        <Time 
+          v-if="node.type === 'time'" :node="(node as ShaderGeneratorNode)"
+          :register-point="registerPoint"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
         />
       </template>
     </NodesCanvas>  

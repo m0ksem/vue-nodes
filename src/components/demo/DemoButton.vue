@@ -1,7 +1,7 @@
 <script setup lang="ts">import { ref, watch } from 'vue';
 
 const props = defineProps({
-  color: { type: String, required: true },
+  color: { type: String, required: false, default: undefined },
   title: { type: String, required: false, default: ""},
   right: { type: Boolean, required: false, default: false }
 })
@@ -23,7 +23,7 @@ watch(circleRef, (newVal) => {
     <template v-if="right">
       <slot>{{ title }}</slot>
     </template>
-    <div class="demo-button__circle" @click="$emit('circle-click')" :style="{ background: color }" ref="circleRef" />
+    <div class="demo-button__circle" @click="$emit('circle-click')" :style="{ background: color, cursor: !!color ? 'pointer' : 'default' }" ref="circleRef" />
     <template v-if="!right">
       <slot>{{ title }}</slot>
     </template>
@@ -45,7 +45,6 @@ watch(circleRef, (newVal) => {
     height: 16px;
     margin-right: 8px;
     border-radius: 50%;
-    cursor: pointer;
     margin-left: -16px;
   }
 
