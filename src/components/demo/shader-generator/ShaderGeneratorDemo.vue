@@ -102,7 +102,7 @@ const items = ref<ShaderGeneratorNode[]>([
 
 const connections = ref<Connection<ShaderGeneratorNode>[]>([])
 
-const { registerPoint, connectFrom, connectTo, searchConnection, disconnectEnd } = useConnections<ShaderGeneratorNode>(connections)
+const { registerPoint, connectFrom, connectTo } = useConnections<ShaderGeneratorNode>(connections)
 
 const shader = computed(() => `precision highp float;
 void main() {
