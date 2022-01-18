@@ -11,6 +11,7 @@ import Fragment from './nodes/Fragment.vue';
 import Vec4 from './nodes/Vec4.vue'
 import Variable from './nodes/Variable.vue'
 import Time from './nodes/Time.vue'
+import MathFunction from './nodes/MathFunction.vue'
 
 const items = ref<ShaderGeneratorNode[]>([
   {
@@ -87,6 +88,16 @@ const items = ref<ShaderGeneratorNode[]>([
       out: {}
     }
   },
+  {
+    position: { x: -200, y: -300 },
+    type: 'math',
+    title: 'Math function',
+    function: 'sin',
+    points: {
+      in: {},
+      out: {}
+    }
+  },
 ])
 
 const connections = ref<Connection<ShaderGeneratorNode>[]>([])
@@ -154,6 +165,12 @@ void main() {
         />
         <Time 
           v-if="node.type === 'time'" :node="(node as ShaderGeneratorNode)"
+          :register-point="registerPoint"
+          @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
+          @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"
+        />
+        <MathFunction 
+          v-if="node.type === 'math'" :node="(node as ShaderGeneratorNode)"
           :register-point="registerPoint"
           @connect-to="connectTo((node as ShaderGeneratorNode), $event)"
           @connect-from="connectFrom((node as ShaderGeneratorNode), $event)"

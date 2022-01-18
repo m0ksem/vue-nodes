@@ -41,7 +41,7 @@ const result = computed(() => {
 
     if (node.type === 'variable') {
       variables.push(node.variable)
-      return `${node.variable.name}`
+      return `${next() || node.variable.name}`
     }
 
     if (node.type === 'vec4') {
@@ -54,6 +54,10 @@ const result = computed(() => {
       }
   
       return 'time'
+    }
+
+    if (node.type === 'math') {
+      return `${node.function}(${next()})`
     }
 
     return ''
