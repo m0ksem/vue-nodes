@@ -1,13 +1,17 @@
 <template>
   <div class="select-wrapper">
-    <div class="input-wrapper" @click="showSelect" :class="{'input-wrapper--focused': isFocused}">
+    <div
+      class="input-wrapper"
+      @click="showSelect"
+      :class="{ 'input-wrapper--focused': isFocused }"
+    >
       <div class="icon-wrapper">
         <span class="material-icons">search</span>
       </div>
-      <input @focus="isFocused=true" @blur="isFocused=false" />
+      <input @focus="isFocused = true" @blur="isFocused = false" />
     </div>
     <div class="select" v-if="isVisible">
-      <div class="nodes" v-for="node in nodeList" :key="node"> {{ node }} </div>
+      <div class="nodes" v-for="node in nodeList" :key="node">{{ node }}</div>
     </div>
   </div>
 </template>
@@ -18,17 +22,43 @@ export default {
     return {
       isVisible: false,
       isFocused: false,
-      nodeList: ["flfldf", "fdkfkd","fdkfkdfk", "flfldf", "fdkfkd","fdkfkdfk","flfldf", "fdkfkd","fdkfkdfk","flfldf", "fdkfkd","fdkfkdfk"],
+      nodeList: [
+        "flfldf",
+        "fdkfkd",
+        "fdkfkdfk",
+        "flfldf",
+        "fdkfkd",
+        "fdkfkdfk",
+        "flfldf",
+        "fdkfkd",
+        "fdkfkdfk",
+        "flfldf",
+        "fdkfkd",
+        "fdkfkdfk",
+      ],
     };
   },
 
+  mounted() {
+    window.addEventListener("click", this.onWindowClick);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("click", this.onWindowClick);
+  },
+
   methods: {
-    showSelect() {
+    showSelect(e) {
       if (this.isVisible === false) {
         this.isVisible = true;
       } else if (this.isVisible === true) {
         this.isVisible = false;
       }
+      e.stopPropagation();
+    },
+
+    onWindowClick() {
+      this.isVisible = false;
     },
   },
 };
@@ -45,8 +75,8 @@ export default {
   overflow: hidden;
 
   &--focused {
-      outline: 3px solid rgba($color: #de6161, $alpha: 1.0);
-      margin-bottom: 2px;
+    outline: 3px solid rgba($color: #de6161, $alpha: 1);
+    margin-bottom: 2px;
   }
 
   .icon-wrapper {
@@ -55,7 +85,7 @@ export default {
     align-items: center;
     width: 40px;
     height: 40px;
-    background: linear-gradient(to right, #6e4e96 0%, #516395  100%);
+    background: linear-gradient(to right, #815baf 0%, #516395 100%);
     user-select: none;
   }
 

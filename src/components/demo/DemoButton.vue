@@ -24,7 +24,7 @@
     width: 100%;
     height: 100%;
     opacity: 0;
-    background: rgba($color: #ffffff, $alpha: 0.1);
+    background: rgba($color: #ffffff, $alpha: 0.2);
     content: "";
     transition: all 0.3s ease-in-out;
     pointer-events: none;
