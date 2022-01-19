@@ -1,10 +1,10 @@
 <template>
   <div class="select-wrapper">
-    <div class="input-wrapper" @click="showSelect">
+    <div class="input-wrapper" @click="showSelect" :class="{'input-wrapper--focused': isFocused}">
       <div class="icon-wrapper">
         <span class="material-icons">search</span>
       </div>
-      <input />
+      <input @focus="isFocused=true" @blur="isFocused=false" />
     </div>
     <div class="select" v-if="isVisible"></div>
   </div>
@@ -15,6 +15,7 @@ export default {
   data() {
     return {
       isVisible: false,
+      isFocused: false,
     };
   },
 
@@ -39,6 +40,11 @@ export default {
   background: rgb(223, 223, 223);
   border-radius: 5px;
   overflow: hidden;
+
+  &--focused {
+      outline: 3px solid rgba($color: #ff3e3e, $alpha: 1.0);
+      margin-bottom: 2px;
+  }
 
   .icon-wrapper {
     display: flex;
