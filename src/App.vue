@@ -110,7 +110,7 @@ const result = computed(() => calculate())
     <p>You have two "Number" inputs and can connect them trough math nodes.</p>
 
     <DemoSelect></DemoSelect>
-    <DemoButton> Add node </DemoButton>
+    <DemoButton class="add-node-btn"> Add node </DemoButton>
   </DemoHeader>
 
   <NodesCanvas v-model:nodes="items" v-model:connections="connections">
@@ -169,6 +169,10 @@ body {
 
 .nodes {
   flex: 1;
+}
+
+.add-node-btn {
+  margin-top: 10px;
 }
 
 // .nodes-demo-item {
