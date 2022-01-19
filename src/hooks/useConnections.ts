@@ -73,7 +73,7 @@ export const useConnections = <NodeSubType = {}>(connections: Ref<Connection<Nod
         (!startPoint || startPoint === start.point) &&
         (!endNode || endNode === end.node) &&
         (!endPoint || endPoint === end.point)
-      )
+      ) as ConnectionWithoutPreset<NodeSubType> | undefined
   }
 
   const findConnection = (cb: (con: ConnectionWithoutPreset<NodeSubType>) => boolean) => 
@@ -127,28 +127,33 @@ export const useConnections = <NodeSubType = {}>(connections: Ref<Connection<Nod
     connections.value = connections.value.filter(({ end }) => !(compareConnection(end, node, point)))
   }
 
-  const recursivePath = <T>(
-    searchFn: (current: NodeAndPoint<NodeSubType>, next: (pointName?: string) => undefined | T, first: NodeAndPoint<NodeSubType>) => T | undefined, 
-    notFoundValue: T, 
-    start?: Connection<NodeSubType>
+  const recursivePath = <R>(
+    searchFn: (o: {
+      node: Node<NodeSubType>, 
+      prev: (pointName?: string) => R,
+    }) => R, 
+    notFoundValue: R,
+    start?: Node<NodeSubType>
   ) => {
-    start = start || connections.value.concat().reverse().find((c) => typeof c.end !== 'string')
+    start = start || (connections.value
+      .concat()
+      .reverse()
+      .find((c) => typeof c.end !== 'string')?.end as NodeAndPoint<NodeSubType> | undefined)?.node
 
     if (!start) { return notFoundValue }
 
-    const getRecursiveResult = (connection: Connection<NodeSubType> | undefined): undefined | T => {
-      if (connection === undefined) { return notFoundValue }
-      
-      if (typeof connection.end === 'string' || typeof connection.start === 'string') { return notFoundValue }
+    const recursiveSearch = (node: Node<NodeSubType> | undefined): R => {
+      if (!node) { return notFoundValue }
 
-      const s = connection.start as NodeAndPoint<NodeSubType>
- 
-      const next = (pointName?: string) => getRecursiveResult(searchConnection(undefined, undefined, s.node, pointName))
-    
-      return searchFn(s, next, start!.end as NodeAndPoint<NodeSubType>)
+      const prev = (pointName?: string) => recursiveSearch(searchConnection(undefined, undefined, node, pointName)?.start.node)
+
+      return searchFn({
+        node,
+        prev,
+      })       
     }
   
-    return getRecursiveResult(start)
+    return recursiveSearch(start)
   }
 
   const isNodeConnection = (connection: Connection<NodeSubType>): connection is ConnectionWithoutPreset<NodeSubType> => {
