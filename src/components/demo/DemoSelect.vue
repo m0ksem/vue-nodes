@@ -6,7 +6,9 @@
       </div>
       <input @focus="isFocused=true" @blur="isFocused=false" />
     </div>
-    <div class="select" v-if="isVisible"></div>
+    <div class="select" v-if="isVisible">
+      <div class="nodes" v-for="node in nodeList" :key="node"> {{ node }} </div>
+    </div>
   </div>
 </template>
 
@@ -16,6 +18,7 @@ export default {
     return {
       isVisible: false,
       isFocused: false,
+      nodeList: ["flfldf", "fdkfkd","fdkfkdfk", "flfldf", "fdkfkd","fdkfkdfk","flfldf", "fdkfkd","fdkfkdfk","flfldf", "fdkfkd","fdkfkdfk"],
     };
   },
 
@@ -42,7 +45,7 @@ export default {
   overflow: hidden;
 
   &--focused {
-      outline: 3px solid rgba($color: #ff3e3e, $alpha: 1.0);
+      outline: 3px solid rgba($color: #de6161, $alpha: 1.0);
       margin-bottom: 2px;
   }
 
@@ -52,7 +55,7 @@ export default {
     align-items: center;
     width: 40px;
     height: 40px;
-    background: rgb(170, 170, 170);
+    background: linear-gradient(to right, #6e4e96 0%, #516395  100%);
     user-select: none;
   }
 
@@ -63,14 +66,33 @@ export default {
     border: none;
     outline: none;
     background: rgb(223, 223, 223);
+    font-size: 16px;
+    padding: 8px;
   }
 }
 
 .select {
   position: absolute;
   width: 300px;
-  height: 300px;
-  background: cadetblue;
+  max-height: 300px;
+  background: rgb(223, 223, 223);
   border-radius: 0px 0px 5px 5px;
+  overflow-y: auto;
+  z-index: 1;
+
+  .nodes {
+    margin: 4px;
+    padding: 6px;
+    color: black;
+    border-radius: 5px;
+    border-bottom: 1px solid rgb(170, 170, 170);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background: rgb(199, 199, 199);
+      transition: all 0.3s ease-in-out;
+    }
+  }
 }
 </style>
