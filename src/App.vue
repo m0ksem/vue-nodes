@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import NodesCanvas from './components/Nodes.vue'
-import DemoHeader from './components/demo/DemoHeader.vue';
+import DemoHeader from './components/demo/DemoHeader.vue'
 import DemoNode from './components/demo/DemoNode.vue'
+import DemoCircle from './components/demo/DemoCircle.vue'
 import DemoButton from './components/demo/DemoButton.vue'
+import DemoSelect from './components/demo/DemoSelect.vue'
 import { computed, ref } from 'vue'
 import { useConnections } from './hooks/useConnections'
-import { Connection, Node } from './types';
+import { Connection, Node } from './types'
 
 const items = ref<Node[]>([
   {
@@ -107,6 +109,8 @@ const result = computed(() => calculate())
 
     <p>You have two "Number" inputs and can connect them trough math nodes.</p>
 
+    <DemoSelect></DemoSelect>
+    <DemoButton> Add node </DemoButton>
   </DemoHeader>
 
   <NodesCanvas v-model:nodes="items" v-model:connections="connections">
@@ -114,7 +118,7 @@ const result = computed(() => calculate())
       <DemoNode :title="node.title">
         <template #inputs>
           <template v-for="(point, pointName) in node.points" :key="pointName">
-            <DemoButton
+            <DemoCircle
               v-if="point.type === 'input'"
               @register-point="registerPoint(node, pointName)($event)"
               @circle-click="disconnectEnd(node, pointName); connectTo(node, pointName)"
@@ -122,13 +126,13 @@ const result = computed(() => calculate())
               :title="point.title"
             >
               <div v-if="node.math === 'print'">{{ result }}</div>
-            </DemoButton>     
+            </DemoCircle>     
           </template>
         </template>
 
         <template #outputs>
           <template v-for="(point, pointName) in node.points" :key="pointName">
-            <DemoButton
+            <DemoCircle
               v-if="point.type === 'output'"
               @register-point="registerPoint(node, pointName)($event)"
               @circle-click="connectFrom(node, pointName)"
@@ -137,7 +141,7 @@ const result = computed(() => calculate())
               right
             >     
               <input v-if="node.value !== undefined" v-model="node.value" />
-            </DemoButton>    
+            </DemoCircle>    
           </template>
         </template>
       </DemoNode>
