@@ -20,10 +20,12 @@ Experimental
 ## Setup
 
 ### Development setup
+
+- Start demo
 ```bash
 yarn
 
-yarn dev
+yarn server
 ```
 
 ### Build for production

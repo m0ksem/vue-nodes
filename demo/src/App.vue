@@ -1,9 +1,5 @@
-<script setup lang="ts">
-import NodesCanvas from './components/demo/shader-generator/ShaderGeneratorDemo.vue'
-</script>
-
 <template>
-  <NodesCanvas />
+  <router-view />
 </template>
 
 <style lang="scss">

@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import { PropType } from "vue";
-import DemoNode from "../../../DemoNode.vue";
-import DemoButton from "../../../DemoButton.vue";
-import DemoInput from "../../../DemoInput.vue";
-import { ShaderGeneratorNode } from "../../types";
+import { ShaderGeneratorNode } from "../types";
 
 const props = defineProps({
   node: { type: Object as PropType<ShaderGeneratorNode>, required: true },

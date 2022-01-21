@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { computed, PropType, toRef } from "vue";
-import DemoNode from "../../../DemoNode.vue";
-import DemoButton from "../../../DemoButton.vue";
-import DemoInput from "../../../DemoInput.vue";
-import { Connection, ShaderGeneratorNode } from "../../types";
+import { Connection, ShaderGeneratorNode } from "../types";
 import { GenerateFnResult, ShaderNode } from "../types";
-import { useConnections } from "../../../../../hooks/useConnections";
+import { useConnections } from '../../../../../../src';
 
 const props = defineProps({
   node: { type: Object as PropType<ShaderNode>, required: true },

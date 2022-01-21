@@ -1,4 +1,4 @@
-import { Node } from '../types'
+import { Node } from 'vue-nodes'
 
 export type GenerateFnResultUniform = { 
   type: string, 
@@ -24,4 +24,4 @@ export type ShaderNode<V = {}> = Node & {
   value: V
 }
 
-export * from '../types'
+export * from 'vue-nodes'

@@ -2,20 +2,23 @@
   "name": "vue-nodes",
   "version": "0.0.1",
   "scripts": {
-    "serve": "vite",
-    "build": "vue-tsc --noEmit && vite build",
+    "build": "vue-tsc --noEmit && vite build --config vite.lib.config.ts",
+    "build:docs": "vue-tsc --noEmit && vite build --config vite.demo.config.ts",
+    "serve": "vite --config vite.demo.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@m0ksem/vue-glsl": "^0.0.1",
     "vue": "^3.2.25"
   },
   "devDependencies": {
+    "@m0ksem/vue-glsl": "^0.0.1",
+    "@types/node": "^17.0.10",
     "@vitejs/plugin-vue": "^2.0.0",
     "sass": "^1.48.0",
     "sass-loader": "^12.4.0",
     "typescript": "^4.4.4",
     "vite": "^2.7.2",
+    "vue-router": "4",
     "vue-tsc": "^0.29.8"
   }
 }

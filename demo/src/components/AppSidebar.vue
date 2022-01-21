@@ -1,6 +1,8 @@
 <template>
   <div class="nodes-demo-header">
     <div class="nodes-demo-header__top">
+      <h1>Vue nodes demo</h1>
+
       <slot />
     </div>
     <div class="nodes-demo-header__bottom">
