@@ -20,16 +20,29 @@ Experimental
 ## Setup
 
 ### Development setup
+- Install dependencies
+```bash
+yarn install
+```
 
 - Start demo
 ```bash
-yarn
-
 yarn server
 ```
 
-### Build for production
-It builds into /docs folder which is served by Github Pages.
+### Build
+- Build lib
 ```bash
 yarn build
 ```
+- Build docs
+```bash
+yarn build:docs
+```
+- Preview docs
+```bash
+yarn preview:docs
+```
+### Docs
+
+`docs` folder is served by Github Pages. Docs's source code is in `demo` folder. 

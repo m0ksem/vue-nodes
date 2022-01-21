@@ -7,7 +7,7 @@ export default defineConfig({
   root: './demo',
   plugins: [vue()],
   build: {
-    outDir: './docs'
+    outDir: '../docs'
   },
   resolve: {
     alias: {

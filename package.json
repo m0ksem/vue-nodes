@@ -2,10 +2,10 @@
   "name": "vue-nodes",
   "version": "0.0.2",
   "scripts": {
+    "serve": "vite --config vite.demo.config.ts",
     "build": "vue-tsc --noEmit && vite build --config vite.lib.config.ts",
     "build:docs": "vue-tsc --noEmit && vite build --config vite.demo.config.ts",
-    "serve": "vite --config vite.demo.config.ts",
-    "preview": "vite preview"
+    "preview:docs": "vite preview --config vite.demo.config.ts"
   },
   "dependencies": {
     "vue": "^3.2.25"

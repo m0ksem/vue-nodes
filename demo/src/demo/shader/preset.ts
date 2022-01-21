@@ -16,8 +16,8 @@ export const itemsPreset: ShaderNode[] = [
   })(),
   (() => {
     const vec4 = createVec4Node({ x: 300, y: 0 })
-    vec4.z = 1;
-    vec4.w = 1;
+    vec4.value.z = 1;
+    vec4.value.w = 1;
     return vec4
   })(),
   createFragmentShaderNode({ x: -300, y: -200 }),
