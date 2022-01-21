@@ -2,7 +2,7 @@
 
 [Nodes](https://m0ksem.github.io/vue-nodes) - customizable nodes editor and generator.
 
-![](/public/readme-image.png)
+![](/demo/public/readme-image.png)
 
 ## Status
 
