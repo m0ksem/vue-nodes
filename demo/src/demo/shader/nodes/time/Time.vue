@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { PropType } from 'vue';
-import { ShaderGeneratorNode } from '../types';
+import { ShaderNode } from '../types';
 
 const props = defineProps({
-  node: { type: Object as PropType<ShaderGeneratorNode>, required: true },
-  registerPoint: { type: Function as PropType<(node: ShaderGeneratorNode, point: string) => (el: any) => void>, required: true }
+  node: { type: Object as PropType<ShaderNode>, required: true },
+  registerPoint: { type: Function as PropType<(node: ShaderNode, point: string) => (el: any) => void>, required: true }
 })
 
 defineEmits({

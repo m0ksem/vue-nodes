@@ -11,7 +11,7 @@ export type GenerateFnResult = {
   uniforms?: GenerateFnResultUniform[]
 }
 
-export type ShaderNode<V = {}> = Node & {
+export type ShaderNode<V = Record<string, any>> = Node & {
   name: string,
   title: string,
   component: any,

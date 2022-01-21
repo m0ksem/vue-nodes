@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, PropType, toRef } from "vue";
-import { Connection, ShaderGeneratorNode } from "../types";
-import { GenerateFnResult, ShaderNode } from "../types";
+import { Connection, GenerateFnResult, ShaderNode } from "../types";
 import { useConnections } from '../../../../../../src';
 
 const props = defineProps({

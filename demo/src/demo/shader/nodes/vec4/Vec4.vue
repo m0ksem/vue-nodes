@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { PropType } from 'vue';
-import { ShaderGeneratorNode, Node } from '../types';
+import { PropType, toRef } from 'vue';
+import { ShaderNode } from '../types';
+import { Connection, useConnections } from 'vue-nodes'
 
 const props = defineProps({
-  node: { type: Object as PropType<ShaderGeneratorNode>, required: true },
-  registerPoint: { type: Function as PropType<(node: ShaderGeneratorNode, point: string) => (el: any) => void>, required: true }
+  node: { type: Object as PropType<ShaderNode>, required: true },
+  registerPoint: { type: Function as PropType<(node: ShaderNode, point: string) => (el: any) => void>, required: true },
+  connections: { type: Array as PropType<Connection<ShaderNode>[]>, required: true }
 })
 
 defineEmits({
@@ -12,6 +14,10 @@ defineEmits({
   'connect-to': (pointName: string) => true,
   'connect-from': (pointName: string) => true,
 })
+
+const { searchConnection } = useConnections(toRef(props, 'connections'))
+
+const isConnected = (pointName: string) => !searchConnection(undefined, undefined, props.node, pointName)
 </script>
 
 <template>
@@ -25,7 +31,7 @@ defineEmits({
         @circle-click="$emit('connect-to', pointName)"
       >
         <span style="margin-right: 8px; width: 10px;"> {{ pointName }} </span>
-        <DemoInput v-model="node.value[pointName]" />
+        <DemoInput v-if="isConnected(pointName)" v-model="node.value[pointName]" />
       </DemoButton>
     </template>
 

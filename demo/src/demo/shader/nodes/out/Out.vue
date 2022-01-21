@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, PropType, toRef } from 'vue';
-import { ShaderGeneratorNode, Node, Connection, GenerateFnResult } from '../types';
+import { ShaderNode, Connection, GenerateFnResult } from '../types';
 import { Shader2D, VueGLSLReadyEvent } from '@m0ksem/vue-glsl'
 import { useConnections } from 'vue-nodes';
 
 const props = defineProps({
-  node: { type: Object as PropType<ShaderGeneratorNode>, required: true },
-  registerPoint: { type: Function as PropType<(node: ShaderGeneratorNode, point: string) => (el: any) => void>, required: true },
-  connections: { type: Array as PropType<Connection<ShaderGeneratorNode>[]>, required: true }
+  node: { type: Object as PropType<ShaderNode>, required: true },
+  registerPoint: { type: Function as PropType<(node: ShaderNode, point: string) => (el: any) => void>, required: true },
+  connections: { type: Array as PropType<Connection<ShaderNode>[]>, required: true }
 })
 
 defineEmits({
@@ -16,9 +16,7 @@ defineEmits({
   'connect-from': (pointName: string) => true,
 })
 
-const { recursivePath, findConnection } = useConnections(toRef(props, 'connections'))
-
-const isTimeUniformUsed = computed(() => path.value.uniforms?.find((u) => u.name === 'u_time'))
+const { recursivePath } = useConnections(toRef(props, 'connections'))
 
 const onCanvasReady = ({ draw, getUniform, gl }: VueGLSLReadyEvent) => {
     draw(() => {

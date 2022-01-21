@@ -14,7 +14,7 @@ export const createMathNode = (position: Point = { x: 0, y: 0 }) => defineNode({
   title: 'Math',
   component: markRaw(Component),
 
-  value: { fn: 'sin' },
+  value: { fn: 'sin', in: '0' },
 
   generate: ({ prev, node }) => {
     const prevNode = prev()
@@ -22,7 +22,7 @@ export const createMathNode = (position: Point = { x: 0, y: 0 }) => defineNode({
     if (!prevNode) { return {} }
 
     return {
-      code: `${node.value.fn}(${prevNode.code})`,
+      code: `${node.value.fn}(${prevNode.code || node.value.in})`,
       uniforms: prevNode.uniforms
     }
   }
