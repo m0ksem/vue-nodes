@@ -1,10 +1,11 @@
 <script setup lang="ts">
-// @ts-ignore
 import { Nodes, useConnections } from '../../../../src'
 import { ref } from 'vue'
 import type { Connection, ShaderNode } from '../../demo/shader/nodes';
 import { itemsPreset, connectionsPreset } from '../../demo/shader/preset'
 import AppLayout from '../../components/AppLayout.vue'
+import AppButton from '../../components/AppButton.vue'
+import AppSelect from '../../components/AppSelect.vue'
 
 const items = ref<ShaderNode<any>[]>(itemsPreset)
 
@@ -17,6 +18,11 @@ const { connectFrom, connectTo, registerPoint } = useConnections(connections)
   <AppLayout>
     <template #sidebar>
       <p>This is a shader generator example, where you can create GLSL shader and preview it.</p>
+      
+      <AppSelect />
+      <AppButton class="add-node-btn">
+        Add node
+      </AppButton>
     </template>
 
     <Nodes v-model:nodes="items" v-model:connections="connections">
@@ -33,3 +39,9 @@ const { connectFrom, connectTo, registerPoint } = useConnections(connections)
     </Nodes>  
   </AppLayout>
 </template>
+
+<style lang="scss">
+.add-node-btn {
+  margin-top: 15px;
+}
+</style>

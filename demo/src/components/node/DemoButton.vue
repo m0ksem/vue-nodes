@@ -1,21 +1,16 @@
 <script setup lang="ts">import { ref, watch } from 'vue';
-
 const props = defineProps({
   color: { type: String, required: false, default: undefined },
   title: { type: String, required: false, default: ""},
   right: { type: Boolean, required: false, default: false }
 })
-
 const emit = defineEmits(['circle-click', 'register-point'])
-
 const circleRef = ref()
-
 watch(circleRef, (newVal) => {
   if (newVal) {
     emit('register-point', newVal)
   }
 })
-
 </script>
 
 <template>
@@ -35,11 +30,9 @@ watch(circleRef, (newVal) => {
   margin: 8px 0;
   display: flex;
   align-items: center;
-
   &:last-child {
     margin-bottom: 0;
   }
-
   &__circle {
     width: 16px;
     height: 16px;
@@ -47,7 +40,6 @@ watch(circleRef, (newVal) => {
     border-radius: 50%;
     margin-left: -16px;
   }
-
   &--right {
     .demo-button {
       &__circle {
