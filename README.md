@@ -2,7 +2,7 @@
 
 [Nodes](https://m0ksem.github.io/vue-nodes) - customizable nodes editor and generator.
 
-![](/public/readme-image.png)
+![](/demo/public/readme-image.png)
 
 ## Status
 
@@ -20,14 +20,29 @@ Experimental
 ## Setup
 
 ### Development setup
+- Install dependencies
 ```bash
-yarn
-
-yarn dev
+yarn install
 ```
 
-### Build for production
-It builds into /docs folder which is served by Github Pages.
+- Start demo
+```bash
+yarn server
+```
+
+### Build
+- Build lib
 ```bash
 yarn build
 ```
+- Build docs
+```bash
+yarn build:docs
+```
+- Preview docs
+```bash
+yarn preview:docs
+```
+### Docs
+
+`docs` folder is served by Github Pages. Docs's source code is in `demo` folder. 

@@ -33,6 +33,7 @@ const props = defineProps({
     border-radius: 5px;
     min-width: 150px;
     flex-direction: column;
+    box-shadow: rgb(38, 57, 77) 0px 20px 30px -10px;
 
     &__header {
       background: linear-gradient(35deg, #2193b0, #6dd5ed);
@@ -66,14 +67,6 @@ const props = defineProps({
     &__content {
       width: 100%;
       text-align: left;
-    }
-
-    input {
-      padding: 4px 8px;
-      background: linear-gradient(243deg, #8e2de2, #4a00e0);
-      border: none;
-      color: white;
-      border-radius: 4px;
     }
   }
 </style>

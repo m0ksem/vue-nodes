@@ -10,14 +10,14 @@ export type DrawConnectionFn = (ctx: CanvasRenderingContext2D, start: Point, end
 
 export type VueRef = Element | ComponentPublicInstance | null | any
 
-export type Node = {
+export type Node<T = {}> = {
   [key: string]: any,
   position: Point,
   points: Record<NodePointName, {
     [key: string]: any,
     el?: HTMLElement,
   }>
-}
+} & T
 
 export enum NodePoint {
   Mouse = 'node-point:mouse'
@@ -25,9 +25,16 @@ export enum NodePoint {
 
 export type NodePointName = string
 
-export type ConnectionPointSource = { node: Node, point: NodePointName } | NodePoint
+export type NodeAndPoint<NodeSubType = {}> = { node: Node<NodeSubType>, point: NodePointName }
 
-export type Connection = {
-  start: ConnectionPointSource,
-  end: ConnectionPointSource
+export type ConnectionPointSource<NodeSubType = {}> = NodeAndPoint<NodeSubType> | NodePoint
+
+export type Connection<NodeSubType = {}> = {
+  start: ConnectionPointSource<NodeSubType>,
+  end: ConnectionPointSource<NodeSubType>
+}
+
+export type ConnectionWithoutPreset<NodeSubType = {}> = {
+  start: NodeAndPoint<NodeSubType>,
+  end: NodeAndPoint<NodeSubType>
 }

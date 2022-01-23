@@ -25,7 +25,7 @@ const onNodeMouseEnter = (index: number) => {
 
 const onNodeMouseLeave = (index: number) => {
   hoveredItemIndex.value = -1
-  timer = setTimeout(() => selectedItemIndex.value = -1, 2000)
+  timer = window.setTimeout(() => selectedItemIndex.value = -1, 2000)
 }
 
 const itemClickOffset = ref({ x: 0, y: 0 })

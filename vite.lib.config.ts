@@ -5,7 +5,11 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
   build: {
-    outDir: './docs'
+    lib: {
+      entry: './src/index.ts',
+      name: 'vue-nodes',
+    },
+    outDir: './dist'
   },
   base: '/vue-nodes',
 })
