@@ -1,9 +1,9 @@
 <template>
   <div class="select-wrapper">
+    <div class="border-gradient" v-if="isFocused"></div>
     <div
       class="input-wrapper"
       @click="showSelect"
-      :class="{ 'input-wrapper--focused': isFocused }"
     >
       <div class="icon-wrapper">
         <span class="material-icons">search</span>
@@ -65,19 +65,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.select-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+.border-gradient {
+  position: absolute;
+  z-index: -1;
+  background: rgb(255, 36, 255);
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  top: 50%; 
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  border-radius: 5px;
+  background: linear-gradient(to right, #2657eb 20%, #de6161 100%);
+}
+
 .input-wrapper {
   display: flex;
-  width: 300px;
+  width: 100%;
   height: 40px;
   box-sizing: border-box;
   background: rgb(223, 223, 223);
   border-radius: 5px;
   overflow: hidden;
-
-  &--focused {
-    outline: 3px solid rgba($color: #de6161, $alpha: 1);
-    margin-bottom: 2px;
-  }
+  z-index: 1;
 
   .icon-wrapper {
     display: flex;
@@ -108,7 +123,7 @@ export default {
   background: rgb(223, 223, 223);
   border-radius: 0px 0px 5px 5px;
   overflow-y: auto;
-  z-index: 1;
+  z-index: 2;
 
   .nodes {
     margin: 4px;
